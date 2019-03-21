@@ -9,25 +9,25 @@ IMAGE_EFFECTS = [#IMAGE_EFFECTS
   'hatch',
   'gpen',
   'pastel',
-  'watercolor',
+  'watercolor',#10
   'film',
   'blur',
   'saturation',
   'colorswap',
-  'washedout',
+  'washedout',#15
   'posterise',
   'colorpoint',
   'colorbalance',
   'cartoon',
   'deinterlace1',
-  'deinterlace2',
+  'deinterlace2',#21
 ]
 import re
 from picamera import PiCamera, PiRenderer
 from time import sleep
 
 camera = PiCamera( )
-camera.resolution = '640x400'
+camera.resolution = '1100x800'
 
 
 ##camera.hflip = True
@@ -42,7 +42,7 @@ camera.shutter_speed = 33333
 camera.framerate = 5
 camera.image_effect = IMAGE_EFFECTS[0]
 
-camera.preview_alpha = 250 #
+#camera.preview_alpha = 250 
 
 alpha = {'-': -1, '+': 1, '=': 1}
 framerateDelta = {'[': -1, ']': 1, '{': -1, '}': 1, }
@@ -50,7 +50,7 @@ framerateDelta = {'[': -1, ']': 1, '{': -1, '}': 1, }
 
 #These property can be set while recordings or previews are active.
 ##camera.zoom = (4.0, 0.0, 1.0, 1.0)
-camera.preview_fullscreen = False
+##camera.preview_fullscreen = False
 
 
 # METHODS
