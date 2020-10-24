@@ -1,11 +1,18 @@
 import re
 from picamera import PiCamera, PiRenderer
-from time import sleep
+
+
+
+import time
+
+
+
+
 
 camera = PiCamera( )
-camera.resolution = '1600x800'
-sleep = 300
+camera.resolution = '800x800'
+sleep = 800
 
 camera.start_preview()
-sleep(sleep)
+time.sleep(sleep)
 camera.stop_preview()

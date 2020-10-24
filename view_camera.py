@@ -27,7 +27,7 @@ from picamera import PiCamera, PiRenderer
 from time import sleep
 
 camera = PiCamera( )
-camera.resolution = '1100x800'
+camera.resolution = '1200x800'
 
 
 ##camera.hflip = True
@@ -39,7 +39,7 @@ camera.rotation = 0
 # camera.preview_window(0,0,640,480)
 
 camera.shutter_speed = 33333
-camera.framerate = 5
+camera.framerate = 30
 camera.image_effect = IMAGE_EFFECTS[0]
 
 #camera.preview_alpha = 250 
@@ -70,7 +70,7 @@ print(len(IMAGE_EFFECTS))
 stroke = "..."
 while stroke != "n":
   
-  stroke = raw_input('type n to exit\n')
+  stroke = input('type n to exit\n')
   #Opacity
   if stroke == '+' or stroke == '=' or stroke == '-': 
     preview_alpha = camera.preview_alpha + 10 * alpha[stroke]
@@ -81,7 +81,6 @@ while stroke != "n":
     continue
   
   if stroke == '[' or stroke == ']' or stroke == '{' or stroke == '}':
-    print('framerate_delta: {0}'.format(camera.framerate_delta))
     camera.framerate_delta = (camera.framerate_delta + 5 * framerateDelta[stroke]) % 60
     print('framerate_delta: {0}'.format(camera.framerate_delta))
     print('framerate: {0}'.format(camera.framerate))
