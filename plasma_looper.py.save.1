@@ -25,7 +25,7 @@ IMAGE_EFFECTS = [  # IMAGE_EFFECTS
     'deinterlace1',
     'deinterlace2',  # 21
 ]
-window=(300,100,1296, 972)
+window=(0,1296, 730)
 #import glob
 #import os
 
@@ -169,7 +169,7 @@ while stroke != "n":
       filename = 'loop'+str(count)+'.' + format
     print(filename, count)
     sleep(1)
-    camera.start_recording(filename)
+    camera.start_recording(filename, format)
     #camera.start_recording('loop_'+str(len(videos))+'.h264')
     sleep(1)
     continue
