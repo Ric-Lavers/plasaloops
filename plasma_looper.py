@@ -29,7 +29,7 @@ window=(300,100,1296, 972)
 #import glob
 #import os
 
-camera = PiCamera( framerate= 35 )
+camera = PiCamera(  )
 #camera.resolution = '800x750'
 def getOptions():
   print('resolution is: '+ str(camera.resolution)+'\n')
@@ -47,7 +47,7 @@ def getOptions():
 
 #options = getOptions()
 #print(options)
-filename = input('filename? or press enter \n')
+#filename = input('filename? or press enter \n')
 print('start looping space cowboy')
 
 #camera.hflip = True
@@ -180,11 +180,10 @@ while stroke != "n":
     print('image_effect_params {0}'.format(camera.image_effect_params))
     continue
 
-  print(str(stroke))
-  print('stroke:' + stroke)
+  
   # only numbers from here
   pattern = re.compile("[0-9]")
-  if not pattern.match(stroke) and stroke != 'n':
+  if not pattern.match(str(stroke)) and stroke != 'n':
     print("not a number")
     continue
   # image effects
