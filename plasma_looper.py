@@ -1,3 +1,4 @@
+filename='temp'
 from time import sleep
 from picamera import PiCamera
 import re,os,glob
@@ -25,7 +26,7 @@ IMAGE_EFFECTS = [  # IMAGE_EFFECTS
     'deinterlace1',
     'deinterlace2',  # 21
 ]
-window=(300,100,1296, 972)
+window=(400,0,1296, 972)
 #import glob
 #import os
 
@@ -98,7 +99,8 @@ def xy():
 hasWindow = 'window' not in globals()
 
 camera.start_preview(fullscreen= hasWindow, window=window)
-
+#shutter_speed
+#camera.zoom(0.0, 0.0, 1.0 1.0)
 print(len(IMAGE_EFFECTS))
 stroke = "..."
 while stroke != "n":
@@ -125,11 +127,11 @@ while stroke != "n":
   # frame rate/ speed
   if stroke == '{' or stroke == '}':
     camera.framerate = (camera.framerate + 3 * framerateDelta[stroke]) % 60
-    print('framerate: {0}'.format(camera.framerate))
+    print('framerate: {0} of 60'.format(camera.framerate))
   if stroke == '[' or stroke == ']':
     camera.framerate_delta = (
         camera.framerate_delta + 3 * framerateDelta[stroke]) % 60
-    print('framerate_delta: {0}'.format(camera.framerate_delta))
+    print('minor framerate adjustment: {0} away from '.format(camera.framerate_delta) + str(camera.framerate))
   #  if stroke == 'rec' or stroke =='R':
   #    videoFolderName="recordings"
   #    continue
