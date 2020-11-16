@@ -1,4 +1,5 @@
-from flask import Flask,jsonify,request,render_template,make_response
+from flask import Flask,jsonify,request,render_template
+from flask_cors import CORS
 from picamera import PiCamera
 from constants import IMAGE_EFFECTS
 IMAGE_EFFECTS=IMAGE_EFFECTS.IMAGE_EFFECTS
@@ -7,6 +8,7 @@ camera = PiCamera()
 camera.resolution = '800x800'
 
 app = Flask(__name__)
+CORS(app)
 
 @app.before_request
 def filter_prefetch():
@@ -50,7 +52,8 @@ def stop_cam():
 #get /effect
 @app.route('/effect')
 def get_effects():
-  return make_response(jsonify({'current': camera.image_effect ,'IMAGE_EFFECTS': IMAGE_EFFECTS}), 200)
+  print(request)
+  return jsonify({'current': camera.image_effect ,'IMAGE_EFFECTS': IMAGE_EFFECTS})
     
 
 #post /effect data: {effect:}
