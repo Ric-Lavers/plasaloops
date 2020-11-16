@@ -34,6 +34,7 @@ def change_effect():
   try:
     request_data = request.get_json()
     newEffect = request_data["effect"]
+    print(newEffect)
     if newEffect not in IMAGE_EFFECTS:
       raise
     camera.image_effect = newEffect
