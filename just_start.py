@@ -1,12 +1,7 @@
 import re
-from picamera import PiCamera, PiRenderer
-
-
+from picamera import PiCamera
 
 import time
-
-
-
 
 
 camera = PiCamera( )
