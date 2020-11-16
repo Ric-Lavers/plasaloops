@@ -14,7 +14,7 @@ app = Flask(__name__)
 @app.route('/init')
 def initalise():
   return jsonify({
-    previewing: camera.previewing,
+    preview: camera.preview,
     recording: camera.recording,
     image_effect: camera.image_effect,
     resolution: camera.resolution,
