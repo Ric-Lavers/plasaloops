@@ -1,4 +1,4 @@
-from flask import Flask,jsonify,request,render_template
+from flask import Flask,jsonify,request,render_template,make_response
 from picamera import PiCamera
 from constants import IMAGE_EFFECTS
 IMAGE_EFFECTS=IMAGE_EFFECTS.IMAGE_EFFECTS
@@ -7,6 +7,31 @@ camera = PiCamera()
 camera.resolution = '800x800'
 
 app = Flask(__name__)
+
+@app.before_request
+def filter_prefetch():
+  print("before request")
+  print(request.headers)
+# uncomment these to filter Chrome specific prefetch requests.
+  if 'Purpose' in request.headers and request.headers.get('Purpose') == 'prefetch':
+    logger.debug("prefetch requests are not allowed")
+    return '', status.HTTP_403_FORBIDDEN
+
+
+@app.after_request
+def debug_after(response):
+  print("after request")
+  header=response.headers
+  header['Access-Control-Allow-Origin'] = '*'
+  header['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+  header['Access-Control-Allow-Methods'] = 'OPTIONS, HEAD, GET, POST, DELETE, PUT'
+
+  response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+  response.headers["Pragma"] = "no-cache"
+  response.headers["Expires"] = "0"
+  response.headers['Cache-Control'] = 'public, max-age=0'
+  response.headers['Connection'] = 'close'
+  return response
 
 # start camera
 @app.route('/start')
@@ -25,7 +50,7 @@ def stop_cam():
 #get /effect
 @app.route('/effect')
 def get_effects():
-  return jsonify({'current': camera.image_effect ,'IMAGE_EFFECTS': IMAGE_EFFECTS})
+  return make_response(jsonify({'current': camera.image_effect ,'IMAGE_EFFECTS': IMAGE_EFFECTS}), 200)
     
 
 #post /effect data: {effect:}
@@ -38,7 +63,7 @@ def change_effect():
     if newEffect not in IMAGE_EFFECTS:
       raise
     camera.image_effect = newEffect
-    return 'changed to {}'.format(newEffect)
+    return jsonify({ effect: newEffect }) #'changed to {}'.format(newEffect)
   except:
     return 'I dont think thats a effect'
 
@@ -109,6 +134,7 @@ def get_item_in_store(name):
   #pass
 
 app.run(
-  host='localhost', 
-  port=5000
+  host='192.168.1.123', 
+  port=5000,
+  threaded=True
 )
