@@ -9,15 +9,16 @@ camera = PiCamera()
 camera.resolution = '800x800'
 
 app = Flask(__name__)
+#print(dir(camera))
 
 # get inital state
 @app.route('/init')
-def initalise():
+def get_inital():
   return jsonify({
-    preview: camera.preview,
-    recording: camera.recording,
-    image_effect: camera.image_effect,
-    resolution: camera.resolution,
+    'previewing': camera.previewing,
+    'recording': camera.recording,
+    'image_effect': camera.image_effect,
+    'resolution': camera.resolution,
   })
 
 # start camera
