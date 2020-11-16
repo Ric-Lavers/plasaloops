@@ -1,5 +1,4 @@
 from flask import Flask,jsonify,request,render_template
-from flask_cors import CORS
 from picamera import PiCamera
 #import logging
 from constants import IMAGE_EFFECTS
@@ -10,32 +9,16 @@ camera = PiCamera()
 camera.resolution = '800x800'
 
 app = Flask(__name__)
-CORS(app)
 
-@app.before_request
-def filter_prefetch():
-  print("before request")
-  print(request.headers)
-# uncomment these to filter Chrome specific prefetch requests.
-  if 'Purpose' in request.headers and request.headers.get('Purpose') == 'prefetch':
-    logger.debug("prefetch requests are not allowed")
-    return '', status.HTTP_403_FORBIDDEN
-
-
-@app.after_request
-def debug_after(response):
-  print("after request")
-  header=response.headers
-  header['Access-Control-Allow-Origin'] = '*'
-  header['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-  header['Access-Control-Allow-Methods'] = 'OPTIONS, HEAD, GET, POST, DELETE, PUT'
-
-  response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-  response.headers["Pragma"] = "no-cache"
-  response.headers["Expires"] = "0"
-  response.headers['Cache-Control'] = 'public, max-age=0'
-  response.headers['Connection'] = 'close'
-  return response
+# get inital state
+@app.route('/init')
+def initalise():
+  return jsonify({
+    previewing: camera.previewing,
+    recording: camera.recording,
+    image_effect: camera.image_effect,
+    resolution: camera.resolution,
+  })
 
 # start camera
 @app.route('/start')
@@ -64,16 +47,35 @@ def change_effect():
   try:
     request_data = request.get_json()
     newEffect = request_data["effect"]
-    print(newEffect)
-    notExists = newEffect not in IMAGE_EFFECTS
-    print(notExists)
-    if notExists:
+    if newEffect not in IMAGE_EFFECTS:
       raise
     camera.image_effect = newEffect
     return jsonify({ 'effect': newEffect })
   except Exception as e:
     print(str(e))
     return 'I dont think thats a effect'
+
+@app.before_request
+def filter_prefetch():
+# uncomment these to filter Chrome specific prefetch requests.
+  if 'Purpose' in request.headers and request.headers.get('Purpose') == 'prefetch':
+    logger.debug("prefetch requests are not allowed")
+    return '', status.HTTP_403_FORBIDDEN
+
+
+@app.after_request
+def debug_after(response):
+  header=response.headers
+  header['Access-Control-Allow-Origin'] = '*'
+  header['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+  header['Access-Control-Allow-Methods'] = 'OPTIONS, HEAD, GET, POST, DELETE, PUT'
+
+  response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+  response.headers["Pragma"] = "no-cache"
+  response.headers["Expires"] = "0"
+  response.headers['Cache-Control'] = 'public, max-age=0'
+  response.headers['Connection'] = 'close'
+  return response
 
 
 
