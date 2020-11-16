@@ -1,9 +1,11 @@
 from flask import Flask,jsonify,request,render_template
 from flask_cors import CORS
 from picamera import PiCamera
+#import logging
 from constants import IMAGE_EFFECTS
 IMAGE_EFFECTS=IMAGE_EFFECTS.IMAGE_EFFECTS
 
+#logger = logging.getLogger()
 camera = PiCamera()
 camera.resolution = '800x800'
 
@@ -63,11 +65,14 @@ def change_effect():
     request_data = request.get_json()
     newEffect = request_data["effect"]
     print(newEffect)
-    if newEffect not in IMAGE_EFFECTS:
+    notExists = newEffect not in IMAGE_EFFECTS
+    print(notExists)
+    if notExists:
       raise
     camera.image_effect = newEffect
-    return jsonify({ effect: newEffect }) #'changed to {}'.format(newEffect)
-  except:
+    return jsonify({ 'effect': newEffect })
+  except Exception as e:
+    print(str(e))
     return 'I dont think thats a effect'
 
 
