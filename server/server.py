@@ -1,8 +1,11 @@
+#! python3
+import sys
 from flask import Flask,jsonify,request,render_template
 from picamera import PiCamera
 #import logging
-from constants import IMAGE_EFFECTS
+from constants import IMAGE_EFFECTS,get_ip
 IMAGE_EFFECTS=IMAGE_EFFECTS.IMAGE_EFFECTS
+get_ip=get_ip.get_ip
 
 #logger = logging.getLogger()
 camera = PiCamera()
@@ -10,6 +13,7 @@ camera.resolution = '800x800'
 
 app = Flask(__name__)
 #print(dir(camera))
+#print ( str(sys.argv))
 
 # get inital state
 @app.route('/init')
@@ -144,8 +148,11 @@ def get_item_in_store(name):
 
   #pass
 
+
+ip=get_ip()
+
 app.run(
-  host='192.168.1.123', 
+  host=ip, 
   port=5000,
   threaded=True
 )
