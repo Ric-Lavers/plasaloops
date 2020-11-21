@@ -60,7 +60,7 @@ def get_filename():
   list_of_videos=glob.glob(filename+'*.'+Format)
   count = len(list_of_videos)
 
-  if count != 0:
+  if count == 0:
     filename = filename + '.' + Format
   else:
     filename = filename+'_'+str(count)+'.' + Format
