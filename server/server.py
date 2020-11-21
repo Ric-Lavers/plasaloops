@@ -81,7 +81,7 @@ def start_recording():
 @app.route('/stop_recording')
 def stop_recording():
   camera.stop_recording()
-  return jsonify({'success': True})
+  return jsonify({'success': True, 'message': 'ended recording as "'+get_filename() +'"'})
 
 #setters
 @app.route('/set_res', methods=['POST'])
