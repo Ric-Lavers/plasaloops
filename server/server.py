@@ -3,6 +3,11 @@ import sys, requests
 from flask import Flask,jsonify,request,render_template
 import re,os,glob
 from picamera import PiCamera
+from OpenSSL import SSL
+context = SSL.Context(SSL.PROTOCOL_TLSv1_2)
+context.use_privatekey_file('server.key')
+context.use_certificate_file('server.crt')
+
 #import logging
 from constants import IMAGE_EFFECTS,get_ip
 IMAGE_EFFECTS=IMAGE_EFFECTS.IMAGE_EFFECTS
@@ -150,5 +155,6 @@ ip=get_ip()
 app.run(
   host=ip, 
   port=PORT,
-  threaded=True
+  threaded=True,
+  ssl_context=context
 )
