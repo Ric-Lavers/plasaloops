@@ -1,6 +1,7 @@
 #! python3
 import sys, requests
 from flask import Flask,jsonify,request,render_template
+import re,os.system("ls -l"),glob
 from picamera import PiCamera
 #import logging
 from constants import IMAGE_EFFECTS,get_ip
@@ -12,19 +13,20 @@ PORT=5000
 camera = PiCamera()
 camera.resolution = '800x800'
 
-global window
+global window,filename
 window=(0,0,0,0)
+filename='loop'
 
-print(camera.preview_window)
 app = Flask(__name__)
 #print(dir(camera))
 #print ( str(sys.argv))
+
 #store current ip remotely
 ip=get_ip() + ':' + str(PORT)
 try:
   requests.post('https://skribbl-lists-serverless.now.sh/api/ip/replace', data={"ip": ip})
-except error:
-  print(error)
+except Exception as e:
+  print(jsonify(e)) 
 
 # get inital state
 @app.route('/init')
@@ -41,7 +43,6 @@ def get_inital():
 @app.route('/start')
 def start_cam():
   print('start camera')
-  print(camera.resolution)
   fs = True if window[3] == 0 or window[2] == 0 else False
   camera.start_preview(fullscreen=fs, window=window)
   return 'start camera'
@@ -52,6 +53,31 @@ def stop_cam():
   print('stop camera')
   camera.stop_preview()
   return 'stop camera'
+
+def get_filename():
+  filename = globals()['filename']
+  Format='h264'
+  list_of_videos=glob.glob(filename+'*.'+Format)
+  count = len(list_of_videos)
+
+  if count != 0:
+    filename = filename + '.' + Format
+  else:
+    filename = filename+'_'+str(count)+'.' + Format
+  return filename
+
+#record file
+@app.route('/start_recording', methods=['POST','GET'])
+def start_recording():
+  d=request.get_json()
+  if 'filename' in d:
+    globals()['filename'] = d['filename']
+  fn = get_filename()
+  print(fn)
+  camera.start_recording(fn)
+  return jsonify({'success': True, 'message': 'started recording as "'+fn +'"'})
+
+
 #setters
 @app.route('/set_res', methods=['POST'])
 def set_res():
@@ -65,8 +91,6 @@ def set_window():
   try:
     d=request.get_json()
     globals()['window']=(int(d['x']),int(d['y']),int(d['height']),int(d['width']))
-    print(window)
-    print('__')
     if camera.previewing:
       start_cam()
     return jsonify({'success': True})
@@ -98,8 +122,7 @@ def change_effect():
 def filter_prefetch():
 # uncomment these to filter Chrome specific prefetch requests.
   if 'Purpose' in request.headers and request.headers.get('Purpose') == 'prefetch':
-    logger.debug("prefetch requests are not allowed")
-    return '', status.HTTP_403_FORBIDDEN
+    return ''
 
 
 @app.after_request
@@ -115,72 +138,6 @@ def debug_after(response):
   response.headers['Cache-Control'] = 'public, max-age=0'
   response.headers['Connection'] = 'close'
   return response
-
-
-
-#demo
-
-stores = [{
-    'name': 'My Store',
-    'items': [{'name':'my item', 'price': 15.99 }]
-}]
-
-@app.route('/')
-def home():
-  return  "hello world"
-  return render_template('index.html')
-
-#post /store data: {name :}
-@app.route('/store' , methods=['POST'])
-def create_store():
-  request_data = request.get_json()
-  new_store = {
-    'name':request_data['name'],
-    'items':[]
-  }
-  stores.append(new_store)
-  return jsonify(new_store)
-  #pass
-
-#get /store/<name> data: {name :}
-@app.route('/store/<string:name>')
-def get_store(name):
-  for store in stores:
-    if store['name'] == name:
-          return jsonify(store)
-  return jsonify ({'message': 'store not found'})
-  #pass
-
-#get /store
-@app.route('/store')
-def get_stores():
-  return jsonify({'stores': stores})
-  #pass
-
-#post /store/<name> data: {name :}
-@app.route('/store/<string:name>/item' , methods=['POST'])
-def create_item_in_store(name):
-  request_data = request.get_json()
-  for store in stores:
-    if store['name'] == name:
-        new_item = {
-            'name': request_data['name'],
-            'price': request_data['price']
-        }
-        store['items'].append(new_item)
-        return jsonify(new_item)
-  return jsonify ({'message' :'store not found'})
-  #pass
-
-#get /store/<name>/item data: {name :}
-@app.route('/store/<string:name>/item')
-def get_item_in_store(name):
-  for store in stores:
-    if store['name'] == name:
-        return jsonify( {'items':store['items'] } )
-  return jsonify ({'message':'store not found'})
-
-  #pass
 
 
 ip=get_ip()
