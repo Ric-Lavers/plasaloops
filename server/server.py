@@ -1,7 +1,7 @@
 #! python3
 import sys, requests
 from flask import Flask,jsonify,request,render_template
-import re,os.system("ls -l"),glob
+import re,os,glob
 from picamera import PiCamera
 #import logging
 from constants import IMAGE_EFFECTS,get_ip
@@ -69,6 +69,7 @@ def get_filename():
 #record file
 @app.route('/start_recording', methods=['POST','GET'])
 def start_recording():
+
   d=request.get_json()
   if 'filename' in d:
     globals()['filename'] = d['filename']
