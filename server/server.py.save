@@ -10,10 +10,9 @@ get_ip=get_ip.get_ip
 PORT=5000
 #logger = logging.getLogger()
 camera = PiCamera()
-camera.resolution = '800x800'
+camera.resolution = '720x720'
 
-global window
-window=(0,0,0,0)
+window=(0,0,640, 640)
 
 print(camera.preview_window)
 app = Flask(__name__)
@@ -41,9 +40,7 @@ def get_inital():
 @app.route('/start')
 def start_cam():
   print('start camera')
-  print(camera.resolution)
-  fs = True if window[3] == 0 or window[2] == 0 else False
-  camera.start_preview(fullscreen=fs, window=window)
+  camera.start_preview(fullscreen=False, window=window)
   return 'start camera'
 
 #stop camera
@@ -52,33 +49,17 @@ def stop_cam():
   print('stop camera')
   camera.stop_preview()
   return 'stop camera'
-#setters
-@app.route('/set_res', methods=['POST'])
-def set_res():
-  d=request.get_json()
-  print(d)
-  camera.resolution= (int(d['width']),int(d['height']))
-  return jsonify({'success': True})
-
-@app.route('/set_window', methods=['POST'])
-def set_window():
-  try:
-    d=request.get_json()
-    globals()['window']=(int(d['x']),int(d['y']),int(d['height']),int(d['width']))
-    print(window)
-    print('__')
-    if camera.previewing:
-      start_cam()
-    return jsonify({'success': True})
-  except Exception as e:
-    return jsonify(e)
 
 #get /effect
 @app.route('/effect')
 def get_effects():
   print(request)
   return jsonify({'current': camera.image_effect ,'IMAGE_EFFECTS': IMAGE_EFFECTS})
-    
+
+@app.route('/set_window', methods=['POST'])
+def set_window():
+  data = request.get_json()
+  window = (data.x,data.y,data.w,data.h)
 
 #post /effect data: {effect:}
 @app.route('/effect' , methods=['POST'])
